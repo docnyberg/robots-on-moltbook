@@ -516,6 +516,258 @@ body {
 }
 
 /* ================================================
+   VOCABULARY & DEFINITIONS
+   ================================================ */
+
+.vocab-term {
+    border-bottom: 1.5px dotted var(--color-accent);
+    cursor: help;
+    transition: background-color var(--transition-fast);
+    position: relative;
+}
+
+.vocab-term:hover {
+    background-color: var(--color-accent-dim);
+}
+
+/* Desktop Popover */
+.definition-popover {
+    position: absolute;
+    z-index: 300;
+    width: 280px;
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-accent);
+    border-radius: 8px;
+    padding: var(--spacing-sm);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--color-text);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.definition-popover.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.definition-title {
+    display: block;
+    color: var(--color-accent);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 0.25rem;
+}
+
+/* Mobile Bottom Sheet */
+.definition-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--color-bg-elevated);
+    border-top: 2px solid var(--color-accent);
+    z-index: 400;
+    padding: var(--spacing-md);
+    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom));
+    transform: translateY(100%);
+    transition: transform var(--transition-normal);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.definition-bottom-sheet.open {
+    transform: translateY(0);
+}
+
+.bottom-sheet-handle {
+    width: 40px;
+    height: 4px;
+    background-color: var(--color-border-light);
+    border-radius: 2px;
+    margin: 0 auto var(--spacing-md);
+}
+
+.bottom-sheet-close {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: none;
+    border: none;
+    color: var(--color-text-dim);
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+/* ================================================
+   AI SIMPLIFICATION SIDEBAR
+   ================================================ */
+
+.para-container {
+    position: relative;
+    margin-bottom: var(--spacing-md);
+    padding-right: 40px; /* Space for the bracket */
+    transition: all var(--transition-normal);
+}
+
+/* The Green Bracket */
+.para-container::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    border-right: 2px solid var(--color-accent);
+    border-top: 2px solid var(--color-accent);
+    border-bottom: 2px solid var(--color-accent);
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all var(--transition-normal);
+    pointer-events: none;
+}
+
+.para-container:hover::after {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.simplification-trigger {
+    position: absolute;
+    right: -10px;
+    top: -15px;
+    background-color: var(--color-bg-elevated);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all var(--transition-normal);
+    letter-spacing: 0.05em;
+}
+
+.para-container:hover .simplification-trigger {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.simplification-trigger:hover {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    box-shadow: 0 0 20px var(--color-accent-glow);
+}
+
+.simplified-text {
+    display: none;
+    background-color: var(--color-bg-elevated);
+    border-left: 3px solid var(--color-accent);
+    padding: var(--spacing-md);
+    margin: var(--spacing-sm) 0 var(--spacing-md);
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.4);
+}
+
+.para-container.simplified .original-text {
+    opacity: 0.25;
+    filter: grayscale(1) blur(0.5px);
+    transition: all 0.4s ease;
+}
+
+.para-container.simplified .simplified-text {
+    display: block;
+    animation: revealSimple 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes revealSimple {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .para-container {
+        padding-right: 0;
+    }
+    .para-container::after {
+        display: none;
+    }
+    .simplification-trigger {
+        position: static;
+        display: inline-block;
+        margin-bottom: 10px;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ================================================
+   MARGIN NOTES (Reading Guide)
+   ================================================ */
+
+.chapter-content p[data-margin-note],
+.chapter-content .para-container[data-margin-note] {
+    position: relative;
+}
+
+.margin-note {
+    position: absolute;
+    right: -200px;
+    top: 0;
+    width: 170px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--color-text-dim);
+    letter-spacing: 0.02em;
+    border-left: 1px solid var(--color-border);
+    padding-left: 12px;
+    opacity: 0;
+    transform: translateX(5px);
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
+    pointer-events: none;
+}
+
+/* Show margin notes when the paragraph is in view */
+.margin-note.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* On screens where margin notes fit (wide enough) */
+@media (min-width: 1200px) {
+    .chapter {
+        max-width: var(--content-max-width);
+        position: relative;
+    }
+}
+
+/* Hide margin notes on narrower screens */
+@media (max-width: 1199px) {
+    .margin-note {
+        display: none;
+    }
+}
+
+/* ================================================
    CUSTOM SCROLLBAR
    ================================================ */
 
